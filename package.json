@@ -18,20 +18,12 @@
 			{
 				"command": "extension.xml-transform",
 				"title": "Xml Transform: Transform"
-			},
-			{
-				"command": "extension.xml-transform-set-xsl",
-				"title": "Xml Transform: Set Xsl"
 			}
 		],
 		"menus": {
-			"explorer/context": [
+			"editor/title": [
 				{
 					"command": "extension.xml-transform",
-					"group": "navigation"
-				},
-				{
-					"command": "extension.xml-transform-set-xsl",
 					"group": "navigation"
 				}
 			]

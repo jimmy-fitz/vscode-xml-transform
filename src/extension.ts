@@ -5,6 +5,61 @@ const xsltProcessor = require('xslt-processor');
 const read = require('read-file');
 const ab2str = require('arraybuffer-to-string');
 
+async function GetFile(uri:vscode.Uri, fileExtensionFilter:string) {
+	let fileToUse;
+	let activeTextEditor = await vscode.window.activeTextEditor;
+
+	if (activeTextEditor !== undefined && activeTextEditor.document.fileName !== "" && activeTextEditor.document.fileName.endsWith(fileExtensionFilter)) {
+		fileToUse = activeTextEditor.document.fileName;
+	}
+	else if (uri !== undefined && uri.fsPath !== "" && uri.fsPath.endsWith(fileExtensionFilter)) {
+		fileToUse = uri.fsPath;
+	}
+	else {
+		let uris = await vscode.workspace.findFiles("*" + fileExtensionFilter);
+		let files = uris.map( (value:vscode.Uri, index:number) => {
+			return value.fsPath;
+		});
+		
+		fileToUse = await vscode.window.showQuickPick(files, {placeHolder: "Select " + fileExtensionFilter + " file to use for the transform..."});		
+	}
+
+	return fileToUse;
+}
+
+async function Transform(uri:vscode.Uri) {
+		
+	//Reference or get the source Xsl File
+	var xslFileToUse = await GetFile(uri, ".xsl");
+
+	//Reference or get the source xml File
+	var xmlFileToTransform = await GetFile(uri, ".xml");
+
+	//Read and convert xml/xsl to string
+	let xmlBuffer = read.sync(xmlFileToTransform);
+	let xmlString = ab2str(xmlBuffer);
+	let xslBuffer = read.sync(xslFileToUse);
+	let xslString = ab2str(xslBuffer);
+
+	//Parse and transform
+	let xml = xsltProcessor.xmlParse(xmlString);
+	let xsl = xsltProcessor.xmlParse(xslString);
+
+	const transformedXml = xsltProcessor.xsltProcess(
+		xml,
+		xsl
+	);
+
+	//Create and show panel
+	const panel = vscode.window.createWebviewPanel(
+		'xmlTransform',
+		'Xml Transformation',
+		vscode.ViewColumn.One,
+		{}
+	);
+	panel.webview.html = transformedXml;
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -18,30 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('extension.xml-transform', (uri:vscode.Uri) => {
 		// The code you place here will be executed every time your command is executed
-		
-		let xmlBuffer = read.sync(uri.fsPath);
-		let xmlString = ab2str(xmlBuffer);
-		let xslBuffer = read.sync('C:/temp/TestXml/test.xsl');
-		let xslString = ab2str(xslBuffer);
-
-		let xml = xsltProcessor.xmlParse(xmlString);
-		let xsl = xsltProcessor.xmlParse(xslString);
-
-		const transformedXml = xsltProcessor.xsltProcess(
-			xml,
-			xsl
-		);
-
-		// Create and show panel
-		const panel = vscode.window.createWebviewPanel(
-			'xmlTransform',
-			'Xml Transformation',
-			vscode.ViewColumn.One,
-			{}
-		);
-
-		// And set its HTML content
-		panel.webview.html = transformedXml;
+		Transform(uri);
 	});
 
 	context.subscriptions.push(disposable);

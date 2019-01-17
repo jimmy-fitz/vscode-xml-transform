@@ -35,6 +35,11 @@ async function Transform(uri:vscode.Uri) {
 	//Reference or get the source xml File
 	var xmlFileToTransform = await GetFile(uri, ".xml");
 
+	//Exit if either file cannot be returned (user didnt pick, 'esc' etc.)
+	if (xslFileToUse === undefined || xmlFileToTransform === undefined) {
+		return;
+	}
+
 	//Read and convert xml/xsl to string
 	let xmlBuffer = read.sync(xmlFileToTransform);
 	let xmlString = ab2str(xmlBuffer);
@@ -66,7 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-		console.log('Congratulations, your extension "vscode-xml-transform" is now active!');
+	console.log('Congratulations, your extension "vscode-xml-transform" is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand

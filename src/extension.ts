@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 const xsltProcessor = require('xslt-processor');
 const read = require('read-file');
+const write = require('write-file');
 const ab2str = require('arraybuffer-to-string');
 
 async function GetFile(uri:vscode.Uri, fileExtensionFilter:string) {
@@ -50,10 +51,13 @@ async function Transform(uri:vscode.Uri) {
 	let xml = xsltProcessor.xmlParse(xmlString);
 	let xsl = xsltProcessor.xmlParse(xslString);
 
-	const transformedXml = xsltProcessor.xsltProcess(
+	let transformedXml = xsltProcessor.xsltProcess(
 		xml,
 		xsl
 	);
+
+	//"Cleanup" html
+	transformedXml = transformedXml.replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;&amp;/g,"&&").replace(/&amp;nbsp;/,"&nbsp;").replace(/&amp;/g,"&");
 
 	//Create and show panel
 	const panel = vscode.window.createWebviewPanel(
@@ -62,6 +66,20 @@ async function Transform(uri:vscode.Uri) {
 		vscode.ViewColumn.One,
 		{}
 	);
+	let outputFile = "c:\\temp\\output.html";
+
+	
+	write(outputFile, transformedXml, function (err:any) {
+		if (err)  {
+			console.log(err);
+			return;
+		}
+		console.log('file is written');
+	});
+
+	vscode.workspace.openTextDocument(outputFile).then(doc => {
+		vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside, preview: false});
+	  });
 	panel.webview.html = transformedXml;
 }
 

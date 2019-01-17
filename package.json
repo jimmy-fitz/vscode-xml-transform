@@ -46,6 +46,7 @@
 	"dependencies": {
 		"arraybuffer-to-string": "^1.0.2",
 		"read-file": "^0.2.0",
+		"write-file": "^1.0.0",
 		"xslt-processor": "^0.11.1"
 	}
 }

@@ -68,6 +68,8 @@ async function Transform(uri:vscode.Uri) {
 	// 	{}
 	// );
 	//panel.webview.html = transformedXml;
+
+	//TODO fix this path
 	let outputFile = "C:\\Users\\jim\\source\\repos\\office-validation\\XSL Output.html";
 
 	

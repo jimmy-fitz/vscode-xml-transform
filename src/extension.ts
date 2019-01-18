@@ -67,6 +67,7 @@ async function Transform(uri:vscode.Uri) {
 	// 	vscode.ViewColumn.One,
 	// 	{}
 	// );
+	//panel.webview.html = transformedXml;
 	let outputFile = "C:\\Users\\jim\\source\\repos\\office-validation\\XSL Output.html";
 
 	
@@ -77,11 +78,10 @@ async function Transform(uri:vscode.Uri) {
 		}
 		console.log('file is written');
 	});
-
 	vscode.workspace.openTextDocument(outputFile).then(doc => {
 		vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside, preview: false});
 	  });
-	panel.webview.html = transformedXml;
+
 }
 
 // this method is called when your extension is activated

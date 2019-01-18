@@ -17,7 +17,7 @@ async function GetFile(uri:vscode.Uri, fileExtensionFilter:string) {
 		fileToUse = uri.fsPath;
 	}
 	else {
-		let uris = await vscode.workspace.findFiles("*" + fileExtensionFilter);
+		let uris = await vscode.workspace.findFiles('**/*' + fileExtensionFilter);
 		let files = uris.map( (value:vscode.Uri, index:number) => {
 			return value.fsPath;
 		});
@@ -60,13 +60,14 @@ async function Transform(uri:vscode.Uri) {
 	transformedXml = transformedXml.replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;&amp;/g,"&&").replace(/&amp;nbsp;/,"&nbsp;").replace(/&amp;/g,"&");
 
 	//Create and show panel
-	const panel = vscode.window.createWebviewPanel(
-		'xmlTransform',
-		'Xml Transformation',
-		vscode.ViewColumn.One,
-		{}
-	);
-	let outputFile = "c:\\temp\\output.html";
+	//TODO wrap this and save in configuration setting
+	// const panel = vscode.window.createWebviewPanel(
+	// 	'xmlTransform',
+	// 	'Xml Transformation',
+	// 	vscode.ViewColumn.One,
+	// 	{}
+	// );
+	let outputFile = "C:\\Users\\jim\\source\\repos\\office-validation\\XSL Output.html";
 
 	
 	write(outputFile, transformedXml, function (err:any) {

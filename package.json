@@ -17,12 +17,13 @@
 		"commands": [
 			{
 				"command": "extension.xml-transform",
-				"title": "Xml Transform: Transform"
+				"title": "Xml Transform"
 			}
 		],
 		"menus": {
 			"editor/title": [
 				{
+					"when": "resourceLangId =~ /(xml|xsl)/",
 					"command": "extension.xml-transform",
 					"group": "navigation"
 				}

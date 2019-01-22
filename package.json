@@ -27,6 +27,22 @@
 					"group": "navigation"
 				}
 			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "Xml Transform",
+			"properties": {
+				"xml-transform.outputPath": {
+					"type": ["string", "null"],
+					"default": null,
+					"description": "Specifies the output path for generated Html file. Leave null or blank to skip writing out file"
+				},
+				"xml-transform.usePreview": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show as Html Preview"
+				}
+			}
 		}
 	},
 	"scripts": {

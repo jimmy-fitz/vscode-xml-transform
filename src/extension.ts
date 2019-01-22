@@ -59,31 +59,32 @@ async function Transform(uri:vscode.Uri) {
 	//"Cleanup" html
 	transformedXml = transformedXml.replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;&amp;/g,"&&").replace(/&amp;nbsp;/,"&nbsp;").replace(/&amp;/g,"&");
 
-	//Create and show panel
-	//TODO wrap this and save in configuration setting
-	// const panel = vscode.window.createWebviewPanel(
-	// 	'xmlTransform',
-	// 	'Xml Transformation',
-	// 	vscode.ViewColumn.One,
-	// 	{}
-	// );
-	//panel.webview.html = transformedXml;
-
-	//TODO fix this path
-	let outputFile = "C:\\Users\\jim\\source\\repos\\office-validation\\XSL Output.html";
-
+	let configuration = vscode.workspace.getConfiguration('xml-transform');
 	
-	write(outputFile, transformedXml, function (err:any) {
-		if (err)  {
-			console.log(err);
-			return;
-		}
-		console.log('file is written');
-	});
-	vscode.workspace.openTextDocument(outputFile).then(doc => {
-		vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside, preview: false});
-	  });
+	//Create and show panel
+	if (configuration.usePreview) {
+		const panel = vscode.window.createWebviewPanel(
+			'xmlTransform',
+			'Xml Transformation',
+			vscode.ViewColumn.One,
+			{}
+		);
+		panel.webview.html = transformedXml;
+	}
 
+	//Create and save file
+	let outputFile = configuration.outputPath;
+	if (outputFile !== null && outputFile !== undefined && outputFile.length > 0) {
+		write(outputFile, transformedXml, function (err:any) {
+			if (err)  {
+				console.log(err);
+				return;
+			}
+			vscode.workspace.openTextDocument(outputFile).then(doc => {
+				vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside, preview: false});
+			});
+		});
+	}
 }
 
 // this method is called when your extension is activated

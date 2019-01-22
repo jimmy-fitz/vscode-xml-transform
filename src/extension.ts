@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 const xsltProcessor = require('xslt-processor');
 const read = require('read-file');
+const write = require('write-file');
 const ab2str = require('arraybuffer-to-string');
 
 async function GetFile(uri:vscode.Uri, fileExtensionFilter:string) {
@@ -16,7 +17,7 @@ async function GetFile(uri:vscode.Uri, fileExtensionFilter:string) {
 		fileToUse = uri.fsPath;
 	}
 	else {
-		let uris = await vscode.workspace.findFiles("*" + fileExtensionFilter);
+		let uris = await vscode.workspace.findFiles('**/*' + fileExtensionFilter);
 		let files = uris.map( (value:vscode.Uri, index:number) => {
 			return value.fsPath;
 		});
@@ -50,19 +51,40 @@ async function Transform(uri:vscode.Uri) {
 	let xml = xsltProcessor.xmlParse(xmlString);
 	let xsl = xsltProcessor.xmlParse(xslString);
 
-	const transformedXml = xsltProcessor.xsltProcess(
+	let transformedXml = xsltProcessor.xsltProcess(
 		xml,
 		xsl
 	);
 
+	//"Cleanup" html
+	transformedXml = transformedXml.replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;&amp;/g,"&&").replace(/&amp;nbsp;/,"&nbsp;").replace(/&amp;/g,"&");
+
+	let configuration = vscode.workspace.getConfiguration('xml-transform');
+	
 	//Create and show panel
-	const panel = vscode.window.createWebviewPanel(
-		'xmlTransform',
-		'Xml Transformation',
-		vscode.ViewColumn.One,
-		{}
-	);
-	panel.webview.html = transformedXml;
+	if (configuration.usePreview) {
+		const panel = vscode.window.createWebviewPanel(
+			'xmlTransform',
+			'Xml Transformation',
+			vscode.ViewColumn.One,
+			{}
+		);
+		panel.webview.html = transformedXml;
+	}
+
+	//Create and save file
+	let outputFile = configuration.outputPath;
+	if (outputFile !== null && outputFile !== undefined && outputFile.length > 0) {
+		write(outputFile, transformedXml, function (err:any) {
+			if (err)  {
+				console.log(err);
+				return;
+			}
+			vscode.workspace.openTextDocument(outputFile).then(doc => {
+				vscode.window.showTextDocument(doc, { viewColumn: vscode.ViewColumn.Beside, preview: false});
+			});
+		});
+	}
 }
 
 // this method is called when your extension is activated

@@ -27,6 +27,22 @@
 					"group": "navigation"
 				}
 			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "Xml Transform",
+			"properties": {
+				"xml-transform.outputPath": {
+					"type": ["string", "null"],
+					"default": null,
+					"description": "Specifies the output path for generated Html file. Leave null or blank to skip writing out file"
+				},
+				"xml-transform.usePreview": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show as Html Preview"
+				}
+			}
 		}
 	},
 	"scripts": {
@@ -46,6 +62,7 @@
 	"dependencies": {
 		"arraybuffer-to-string": "^1.0.2",
 		"read-file": "^0.2.0",
+		"write-file": "^1.0.0",
 		"xslt-processor": "^0.11.1"
 	}
 }
